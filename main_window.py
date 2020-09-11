@@ -21,6 +21,7 @@ class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
         self.setWindowTitle(__appname__)
         self.setupUi(self)
         self.setListener()
+        print(self.username)
 
     def setListener(self):
         # 设置强焦点事件, 只能通过TAB和鼠标获取焦点, 保证能使用空格切换图片
@@ -66,7 +67,7 @@ class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
             self.blur_radio.toggle()
 
     def prev_button_listener(self):
-        print('上一张')
+        print(u'上一张')
         if self.img_dir is not None:
             index = self.img_list.index(self.img_name)
             if self.save_img() and index != 0:
@@ -74,7 +75,7 @@ class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
                 self.set_img()
 
     def next_button_listener(self):
-        print('下一张')
+        print(u'下一张')
         if self.img_dir is not None:
             index = self.img_list.index(self.img_name)
             if self.save_img() and index != len(self.img_list) - 1:
