@@ -4,15 +4,19 @@ import os
 import shutil
 
 
-class MainWindow(object):
-    def __init__(self, username=None):
-        super().__init__()
+__appname__ = u'图片标注小工具'
+
+
+class MainWindow(QtWidgets.QMainWindow):
+    def __init__(self, username=None, parent=None):
         self.img_dir = None     # 切割后的图片路径
         self.save_dir = None    # 打好标签的图片保存路径, 会在该路径下建立三个文件夹:person_cheat, person_not_cheat, blur
         self.img_list = None    # 图片路径下的所有图片名称数组
         self.img_name = None    # 当前显示图片的名称
         self.labels = None      # 所有图片的标签
         self.username = username
+        super(MainWindow, self).__init__(parent)
+        self.setupUi(self)
         
     def setupUi(self, SmallLabelTool):
         SmallLabelTool.setObjectName("SmallLabelTool")
@@ -165,7 +169,7 @@ class MainWindow(object):
 
     def retranslateUi(self, SmallLabelTool):
         _translate = QtCore.QCoreApplication.translate
-        SmallLabelTool.setWindowTitle(_translate("SmallLabelTool", "图片标签小工具"))
+        SmallLabelTool.setWindowTitle(_translate("SmallLabelTool", __appname__))
         self.prev_button.setText(_translate("SmallLabelTool", "上一张"))
         self.next_button.setText(_translate("SmallLabelTool", "下一张"))
         self.person_not_cheat_radio.setText(_translate("SmallLabelTool", "person_not_cheat"))
