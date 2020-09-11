@@ -4,14 +4,15 @@ import os
 import shutil
 
 
-class UiSmallLabelTool(object):
-    def __init__(self):
+class MainWindow(object):
+    def __init__(self, username=None):
         super().__init__()
         self.img_dir = None     # 切割后的图片路径
         self.save_dir = None    # 打好标签的图片保存路径, 会在该路径下建立三个文件夹:person_cheat, person_not_cheat, blur
         self.img_list = None    # 图片路径下的所有图片名称数组
         self.img_name = None    # 当前显示图片的名称
         self.labels = None      # 所有图片的标签
+        self.username = username
         
     def setupUi(self, SmallLabelTool):
         SmallLabelTool.setObjectName("SmallLabelTool")
