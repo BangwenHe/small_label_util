@@ -1,13 +1,15 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from image_with_mouse_control import ImageWithMouseControl
+import sys
 import os
 import shutil
+import ui_main_window
 
 
 __appname__ = u'图片标注小工具'
 
 
-class MainWindow(QtWidgets.QMainWindow):
+class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
     def __init__(self, username=None, parent=None):
         self.img_dir = None     # 切割后的图片路径
         self.save_dir = None    # 打好标签的图片保存路径, 会在该路径下建立三个文件夹:person_cheat, person_not_cheat, blur
@@ -16,139 +18,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.labels = None      # 所有图片的标签
         self.username = username
         super(MainWindow, self).__init__(parent)
+        self.setWindowTitle(__appname__)
         self.setupUi(self)
-        
-    def setupUi(self, SmallLabelTool):
-        SmallLabelTool.setObjectName("SmallLabelTool")
-        SmallLabelTool.resize(837, 617)
-        self.centralwidget = QtWidgets.QWidget(SmallLabelTool)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.centralwidget.sizePolicy().hasHeightForWidth())
-        self.centralwidget.setSizePolicy(sizePolicy)
-        self.centralwidget.setMinimumSize(QtCore.QSize(493, 305))
-        self.centralwidget.setMaximumSize(QtCore.QSize(1920, 1080))
-        self.centralwidget.setObjectName("centralwidget")
-        self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
-        self.gridLayout.setObjectName("gridLayout")
-        self.next_prev = QtWidgets.QFrame(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(1)
-        sizePolicy.setVerticalStretch(1)
-        sizePolicy.setHeightForWidth(self.next_prev.sizePolicy().hasHeightForWidth())
-        self.next_prev.setSizePolicy(sizePolicy)
-        self.next_prev.setStyleSheet("")
-        self.next_prev.setLineWidth(1)
-        self.next_prev.setObjectName("next_prev")
-        self.prev_next = QtWidgets.QHBoxLayout(self.next_prev)
-        self.prev_next.setContentsMargins(0, 0, 0, 0)
-        self.prev_next.setSpacing(6)
-        self.prev_next.setObjectName("prev_next")
-        self.prev_button = QtWidgets.QPushButton(self.next_prev)
-        self.prev_button.setObjectName("prev_button")
-        self.prev_next.addWidget(self.prev_button)
-        self.next_button = QtWidgets.QPushButton(self.next_prev)
-        self.next_button.setObjectName("next_button")
-        self.prev_next.addWidget(self.next_button)
-        self.gridLayout.addWidget(self.next_prev, 1, 2, 1, 1)
-        self.labels = QtWidgets.QGroupBox(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(1)
-        sizePolicy.setVerticalStretch(10)
-        sizePolicy.setHeightForWidth(self.labels.sizePolicy().hasHeightForWidth())
-        self.labels.setSizePolicy(sizePolicy)
-        self.labels.setMaximumSize(QtCore.QSize(159, 16777215))
-        self.labels.setStyleSheet("QGroupBox#labels{border:1px solid #828790}")
-        self.labels.setObjectName("labels")
-        self.label = QtWidgets.QVBoxLayout(self.labels)
-        self.label.setObjectName("label")
-        self.person_not_cheat_radio = QtWidgets.QRadioButton(self.labels)
-        self.person_not_cheat_radio.setObjectName("person_not_cheat_radio")
-        self.blur_radio = QtWidgets.QRadioButton(self.labels)
-        self.blur_radio.setObjectName("blur_radio")
-        self.person_cheat_radio = QtWidgets.QRadioButton(self.labels)
-        self.person_cheat_radio.setObjectName("person_cheat_radio")
-        
-        # 调整标签位置
-        self.label.addWidget(self.person_not_cheat_radio)
-        self.label.addWidget(self.person_cheat_radio)
-        self.label.addWidget(self.blur_radio)
-        
-        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.label.addItem(spacerItem)
-        self.label.setStretch(1, 2)
-        self.gridLayout.addWidget(self.labels, 0, 2, 1, 1)
+        self.setListener()
 
-        self.img_preview_list = QtWidgets.QListWidget(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(1)
-        sizePolicy.setVerticalStretch(1)
-        sizePolicy.setHeightForWidth(self.img_preview_list.sizePolicy().hasHeightForWidth())
-        self.img_preview_list.setSizePolicy(sizePolicy)
-        self.img_preview_list.setMaximumSize(QtCore.QSize(159, 16777215))
-        self.img_preview_list.setStyleSheet("QListWidget#img_preview_list{border:1px solid #828790; background: #f0f0f0}")
-        self.img_preview_list.setFrameShape(QtWidgets.QFrame.Box)
-        self.img_preview_list.setObjectName("img_preview_list")
-        self.gridLayout.addWidget(self.img_preview_list, 0, 3, 2, 1)
-        self.frame = QtWidgets.QFrame(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(2)
-        sizePolicy.setVerticalStretch(1)
-        sizePolicy.setHeightForWidth(self.frame.sizePolicy().hasHeightForWidth())
-        self.frame.setSizePolicy(sizePolicy)
-        self.frame.setStyleSheet("QFrame#frame{border:1px solid #828790}")
-        self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frame.setObjectName("frame")
-        self.horizontalLayout = QtWidgets.QHBoxLayout(self.frame)
-        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
-        self.horizontalLayout.setObjectName("horizontalLayout")
-
-        # 这里换成image_with_mouse_control的对象
-        self.photo = ImageWithMouseControl(self.frame)
-        self.photo.setEnabled(True)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(1)
-        sizePolicy.setVerticalStretch(1)
-        sizePolicy.setHeightForWidth(self.photo.sizePolicy().hasHeightForWidth())
-        self.photo.setSizePolicy(sizePolicy)
-        self.photo.setTabletTracking(False)
-        self.photo.setObjectName("photo")
-        self.horizontalLayout.addWidget(self.photo)
-        self.gridLayout.addWidget(self.frame, 0, 0, 2, 1)
-        SmallLabelTool.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(SmallLabelTool)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 837, 23))
-        self.menubar.setObjectName("menubar")
-        self.menuopen = QtWidgets.QMenu(self.menubar)
-        self.menuopen.setObjectName("menuopen")
-        self.menu = QtWidgets.QMenu(self.menubar)
-        self.menu.setObjectName("menu")
-        SmallLabelTool.setMenuBar(self.menubar)
-        self.statusBar = QtWidgets.QStatusBar(SmallLabelTool)
-        self.statusBar.setObjectName("statusBar")
-        SmallLabelTool.setStatusBar(self.statusBar)
-        self.action_open_img_dir = QtWidgets.QAction(SmallLabelTool)
-        self.action_open_img_dir.setObjectName("action_open_img_dir")
-        self.action_change_img_save_path = QtWidgets.QAction(SmallLabelTool)
-        self.action_change_img_save_path.setObjectName("action_change_img_save_path")
-        self.action_help = QtWidgets.QAction(SmallLabelTool)
-        self.action_help.setObjectName("action_help")
-        self.menuopen.addAction(self.action_open_img_dir)
-        self.menuopen.addAction(self.action_change_img_save_path)
-        self.menu.addAction(self.action_help)
-        self.menubar.addAction(self.menuopen.menuAction())
-        self.menubar.addAction(self.menu.menuAction())
-
-        self.retranslateUi(SmallLabelTool)
-        QtCore.QMetaObject.connectSlotsByName(SmallLabelTool)
-        SmallLabelTool.setTabOrder(self.person_not_cheat_radio, self.blur_radio)
-        SmallLabelTool.setTabOrder(self.blur_radio, self.person_cheat_radio)
-        SmallLabelTool.setTabOrder(self.person_cheat_radio, self.prev_button)
-        SmallLabelTool.setTabOrder(self.prev_button, self.next_button)
-        SmallLabelTool.setTabOrder(self.next_button, self.img_preview_list)
-
+    def setListener(self):
         # 设置强焦点事件, 只能通过TAB和鼠标获取焦点, 保证能使用空格切换图片
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
 
@@ -161,25 +35,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.person_cheat_radio.clicked.connect(self.label_choose_listener)
         self.person_not_cheat_radio.clicked.connect(self.label_choose_listener)
         self.blur_radio.clicked.connect(self.label_choose_listener)
-
-        # 关闭标签按钮
-        self.person_cheat_radio.setDisabled(True)
-        self.person_not_cheat_radio.setDisabled(True)
-        self.blur_radio.setDisabled(True)
-
-    def retranslateUi(self, SmallLabelTool):
-        _translate = QtCore.QCoreApplication.translate
-        SmallLabelTool.setWindowTitle(_translate("SmallLabelTool", __appname__))
-        self.prev_button.setText(_translate("SmallLabelTool", "上一张"))
-        self.next_button.setText(_translate("SmallLabelTool", "下一张"))
-        self.person_not_cheat_radio.setText(_translate("SmallLabelTool", "person_not_cheat"))
-        self.blur_radio.setText(_translate("SmallLabelTool", "blur"))
-        self.person_cheat_radio.setText(_translate("SmallLabelTool", "person_cheat"))
-        self.menuopen.setTitle(_translate("SmallLabelTool", "文件"))
-        self.menu.setTitle(_translate("SmallLabelTool", "帮助"))
-        self.action_open_img_dir.setText(_translate("SmallLabelTool", "打开文件路径"))
-        self.action_change_img_save_path.setText(_translate("SmallLabelTool", "改变图像保存路径"))
-        self.action_help.setText(_translate("SmallLabelTool", "打开帮助窗口"))
 
     def keyReleaseEvent(self, e):
         if e.key() == QtCore.Qt.Key_Left:
@@ -262,9 +117,6 @@ class MainWindow(QtWidgets.QMainWindow):
         print('打开文件夹:', directory)
         if directory != '':
             self.img_dir = directory
-            self.person_cheat_radio.setDisabled(False)
-            self.person_not_cheat_radio.setDisabled(False)
-            self.blur_radio.setDisabled(False)
 
         # 打开图片文件夹
         suffix = ['jpg', 'jpeg', 'bmp', 'png']
@@ -315,3 +167,12 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.save_img():
             self.img_name = item.text()
             self.set_img()
+
+
+if __name__ == '__main__':
+    # 测试主窗口
+    # 直接打开主窗口是可行的, 但是通过登录窗口打开失败了
+    app = QtWidgets.QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec_())

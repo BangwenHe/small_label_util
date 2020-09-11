@@ -1,8 +1,3 @@
-# encoding:utf8
-# https://github.com/SmileJET/utils-for-python
-
-import sys
-
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -22,7 +17,6 @@ class ImageWithMouseControl(QWidget):
         self.scaled_img = self.img
         self.first = True
         self.point = QPoint(0, 0)
-        self.setStyleSheet('border: 1px solid')
 
     def adjust_image(self):
         h = self.img.height()
