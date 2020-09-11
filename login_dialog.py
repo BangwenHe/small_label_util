@@ -6,7 +6,7 @@ import main_window
 class LoginDialog(QDialog):
     def __init__(self, parent=None):
         super(LoginDialog, self).__init__(parent)
-        usr = QLabel("用户：")
+        usr = QLabel(u"用户：")
         self.usrLineEdit = QLineEdit()
         self.user = None
 
@@ -34,12 +34,15 @@ class LoginDialog(QDialog):
 
     def accept(self):
         if not self.usrLineEdit.text().strip():
-            QMessageBox.warning(self, "警告", "用户名为空！", QMessageBox.Yes)
+            QMessageBox.warning(self, "警告", u"用户名为空！", QMessageBox.Yes)
             self.usrLineEdit.setFocus()
         else:
             self.user = self.usrLineEdit.text().strip()
+            self.main = main_window.MainWindow(self.user)
+            self.main.show()
             super(LoginDialog, self).accept()
 
     def reject(self):
-        QMessageBox.warning(self, "退出", "确定退出？", QMessageBox.Yes)
+        QMessageBox.warning(self, "退出", u"确定退出？", QMessageBox.Yes)
+        super(LoginDialog, self).reject()
         sys.exit(0)
