@@ -21,7 +21,21 @@ class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
         self.setWindowTitle(__appname__)
         self.setupUi(self)
         self.setListener()
-        print(self.username)
+        self.username_label.setText(self.username)
+
+    def setupUi(self, MainWindow):
+        # 继承ui, 添加图片展示
+        super().setupUi(self)
+        self.photo = ImageWithMouseControl(self.frame)
+        self.photo.setEnabled(True)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(1)
+        sizePolicy.setVerticalStretch(1)
+        sizePolicy.setHeightForWidth(self.photo.sizePolicy().hasHeightForWidth())
+        self.photo.setSizePolicy(sizePolicy)
+        self.photo.setTabletTracking(False)
+        self.photo.setObjectName("photo")
+        self.horizontalLayout.addWidget(self.photo)
 
     def setListener(self):
         # 设置强焦点事件, 只能通过TAB和鼠标获取焦点, 保证能使用空格切换图片
@@ -174,6 +188,6 @@ if __name__ == '__main__':
     # 测试主窗口
     # 直接打开主窗口是可行的, 但是通过登录窗口打开失败了
     app = QtWidgets.QApplication(sys.argv)
-    window = MainWindow()
+    window = MainWindow(username='test')
     window.show()
     sys.exit(app.exec_())
