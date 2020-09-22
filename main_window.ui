@@ -257,7 +257,7 @@
       <property name="styleSheet">
        <string notr="true">QFrame#labels{border:1px solid #828790}</string>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0">
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0">
        <property name="leftMargin">
         <number>0</number>
        </property>
@@ -294,26 +294,33 @@
             </property>
            </widget>
           </item>
-          <item>
-           <spacer name="verticalSpacer">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
          </layout>
         </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
        <item>
         <widget class="QPushButton" name="add_button">
          <property name="text">
           <string>添加</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="edit_button">
+         <property name="text">
+          <string>修改</string>
          </property>
         </widget>
        </item>
