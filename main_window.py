@@ -4,9 +4,11 @@ import sys
 import os
 import shutil
 import ui_main_window
+import label_dialog
 
 
 __appname__ = u'图片标注小工具'
+__max_label_num__ = 10
 
 
 class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
@@ -16,6 +18,8 @@ class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
         self.img_list = None    # 图片路径下的所有图片名称数组
         self.img_name = None    # 当前显示图片的名称
         self.labels = None      # 所有图片的标签
+        self.labeled_img = 0
+        self.edited_img = 0
         self.username = username
         super(MainWindow, self).__init__(parent)
         self.setWindowTitle(__appname__)
@@ -37,6 +41,10 @@ class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
         self.photo.setObjectName("photo")
         self.horizontalLayout.addWidget(self.photo)
 
+        # 必须从int强转成string
+        self.labeled_number_label.setText(str(self.labeled_img))
+        self.edit_number_label.setText(str(self.edited_img))
+
     def setListener(self):
         # 设置强焦点事件, 只能通过TAB和鼠标获取焦点, 保证能使用空格切换图片
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
@@ -50,6 +58,9 @@ class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
         self.person_cheat_radio.clicked.connect(self.label_choose_listener)
         self.person_not_cheat_radio.clicked.connect(self.label_choose_listener)
         self.blur_radio.clicked.connect(self.label_choose_listener)
+        self.add_button.clicked.connect(self.add_label_radio_button_listener)
+        self.delete_button.clicked.connect(self.delete_label_radio_button_listener)
+        self.edit_button.clicked.connect(self.edit_label_radio_button_listener)
 
     def keyReleaseEvent(self, e):
         if e.key() == QtCore.Qt.Key_Left:
@@ -116,13 +127,23 @@ class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
             # 如果前后的标签不一致
             if label != old_label:
                 try:
+                    # 图片存在, 说明标签被修改
                     shutil.move(os.path.join(self.save_dir, labels[old_label], self.img_name),
                                 os.path.join(self.save_dir, labels[label], self.img_name))
+                    self.edited_img += 1
+                    self.edit_number_label.setText(f'{self.edited_img}')
                 except FileNotFoundError as e:
+                    # 图片不存在, 说明新打了这张图片
                     shutil.copy(os.path.join(self.img_dir, self.img_name), os.path.join(self.save_dir, labels[label]))
+                    self.labeled_img += 1
+                    self.labeled_number_label.setText(f'{self.labeled_img}')
+
             # 如果一致, 但是没有图片, 也需要修改
             elif self.img_name not in os.listdir(os.path.join(self.save_dir, labels[label])):
                 shutil.copy(os.path.join(self.img_dir, self.img_name), os.path.join(self.save_dir, labels[label]))
+
+                self.labeled_img += 1
+                self.labeled_number_label.setText(f'{self.labeled_img}')
             return True
         return False
 
@@ -182,6 +203,37 @@ class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
         if self.save_img():
             self.img_name = item.text()
             self.set_img()
+
+    def get_checked_button(self):
+        radio_buttons = self.all_label.findChildren(QtWidgets.QRadioButton)
+        for item in radio_buttons:
+            if item.isChecked():
+                return item
+
+    def add_label_radio_button_listener(self):
+        # TODO: add button listener
+        if len(self.all_label.findChildren(QtWidgets.QRadioButton)) >= __max_label_num__:
+            QtWidgets.QMessageBox.information(self, "信息", f"最大添加量为{__max_label_num__}", QtWidgets.QMessageBox.Yes)
+        else:
+            btn = QtWidgets.QRadioButton(self.all_label)
+            self.verticalLayout_2.addWidget(btn)
+            dialog = label_dialog.LabelDialog(btn=btn)
+            dialog.exec_()
+
+    def delete_label_radio_button_listener(self):
+        # TODO: delete button listner
+        print('按下了删除按钮', self.get_checked_button().text())
+        btn = self.get_checked_button()
+        if btn is None:
+            QtWidgets.QMessageBox.warning(self, "警告", "尚未选择标签", QtWidgets.QMessageBox.Yes)
+        else:
+            btn.deleteLater()
+
+    def edit_label_radio_button_listener(self):
+        btn = self.get_checked_button()
+        if btn is not None:
+            dialog = label_dialog.LabelDialog(btn=btn)
+            dialog.exec_()
 
 
 if __name__ == '__main__':
