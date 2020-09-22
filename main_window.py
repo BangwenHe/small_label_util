@@ -5,10 +5,12 @@ import os
 import shutil
 import ui_main_window
 import label_dialog
+import json
 
 
 __appname__ = u'图片标注小工具'
 __max_label_num__ = 10
+__profile__ = 'profile.json'
 
 
 class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
@@ -18,14 +20,15 @@ class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
         self.img_list = None    # 图片路径下的所有图片名称数组
         self.img_name = None    # 当前显示图片的名称
         self.labels = None      # 所有图片的标签
-        self.labeled_img = 0
-        self.edited_img = 0
-        self.username = username
+        self.labeled_img = 0    # 已打标签数量
+        self.edited_img = 0     # 修改标签数量
+        self.username = username # 用户名
         super(MainWindow, self).__init__(parent)
         self.setWindowTitle(__appname__)
         self.setupUi(self)
         self.setListener()
         self.username_label.setText(self.username)
+        self.read_user_profile()
 
     def setupUi(self, MainWindow):
         # 继承ui, 添加图片展示
@@ -235,6 +238,12 @@ class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
             dialog = label_dialog.LabelDialog(btn=btn)
             dialog.exec_()
 
+    def read_user_profile(self):
+        # 读取配置文件
+        if os.path.exists(os.path.join('.', __profile__)):
+            with open(os.path.join('.', __profile__), 'r') as f:
+                dic = json.loads(" ".join(f.readlines()))
+                print(dic)
 
 if __name__ == '__main__':
     # 测试主窗口
