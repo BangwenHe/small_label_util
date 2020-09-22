@@ -1,0 +1,24 @@
+{
+    "user":[
+        {
+            "username":"u1",
+            "img_dir":"./imgs",
+            "save_dir":".",
+            "labels":[
+                "person_cheat",
+                "person_not_cheat",
+                "blur"
+            ]
+        },
+        {
+            "username":"u2",
+            "img_dir":"E:/Images",
+            "save_dir":"E:/Downloads",
+            "labels":[
+                "person_cheat",
+                "person_not_cheat",
+                "non_linear"
+            ]
+        }
+    ]
+}
