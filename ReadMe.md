@@ -29,10 +29,6 @@
 │   ├── label_dialog.py<br>
 │   └── login_dialog.py<br>
 ├── imgs<br>
-│   ├── 1.png<br>
-│   ├── 2.png<br>
-│   ├── 3.png<br>
-│   ├── 4.png<br>
 │   └── interface.png<br>
 ├── main.py<br>
 ├── main_window.py<br>
