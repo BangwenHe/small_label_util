@@ -1,10 +1,10 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from image_with_mouse_control import ImageWithMouseControl
+from util.image_with_mouse_control import ImageWithMouseControl
 import sys
 import os
 import shutil
-import ui_main_window
-import label_dialog
+from ui import ui_main_window
+from dialog import label_dialog
 import json
 
 
@@ -353,10 +353,12 @@ class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
                     self.set_img()
         else:
             with open(os.path.join('.', __profile__), 'w') as f:
+                # 写入初始json构造
                 dic = {'user': []}
                 json.dump(dic, f, indent=4, separators=[',', ':'])
 
     def closeEvent(self, e):
+        # 关闭窗口时保存配置文件
         reply = QtWidgets.QMessageBox.question(self, '本程序', "是否要退出程序？", QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.No)
         if reply == QtWidgets.QMessageBox.Yes:
             if os.path.exists(os.path.join('.', __profile__)):

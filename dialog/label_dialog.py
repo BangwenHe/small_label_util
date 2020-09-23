@@ -1,6 +1,5 @@
-from ui_label_dialog import Ui_Dialog
-from PyQt5 import QtCore, QtGui, QtWidgets
-import sys
+from ui.ui_label_dialog import Ui_Dialog
+from PyQt5 import QtWidgets
 
 
 class LabelDialog(QtWidgets.QDialog, Ui_Dialog):
