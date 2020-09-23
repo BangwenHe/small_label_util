@@ -272,29 +272,7 @@
        </property>
        <item>
         <widget class="QGroupBox" name="all_label">
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <item>
-           <widget class="QRadioButton" name="person_not_cheat_radio">
-            <property name="text">
-             <string>person_not_cheat</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="person_cheat_radio">
-            <property name="text">
-             <string>person_cheat</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="blur_radio">
-            <property name="text">
-             <string>blur</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         <layout class="QVBoxLayout" name="verticalLayout_2"/>
         </widget>
        </item>
        <item>

@@ -4,7 +4,8 @@
             "username":"u1",
             "img_dir":"./imgs",
             "save_dir":".",
-            "labels":[
+            "img_name":"1.png",
+            "label_name":[
                 "person_cheat",
                 "person_not_cheat",
                 "blur"
@@ -12,9 +13,10 @@
         },
         {
             "username":"u2",
-            "img_dir":"E:/Images",
+            "img_dir":"E:/Pictures",
             "save_dir":"E:/Downloads",
-            "labels":[
+            "img_name":"2.png",
+            "label_name":[
                 "person_cheat",
                 "person_not_cheat",
                 "non_linear"
