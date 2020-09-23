@@ -6,11 +6,7 @@ import shutil
 from ui import ui_main_window
 from dialog import label_dialog
 import json
-
-
-__appname__ = u'图片标注小工具'
-__max_label_num__ = 10
-__profile__ = 'config.json'
+import config
 
 
 class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
@@ -25,7 +21,7 @@ class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
         self.edited_img = 0     # 修改标签数量
         self.username = username # 用户名
         super(MainWindow, self).__init__(parent)
-        self.setWindowTitle(__appname__)
+        self.setWindowTitle(config.app_name)
         self.setupUi(self)
         self.setListener()
         self.username_label.setText(self.username)
@@ -99,32 +95,15 @@ class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
                 btn.clicked.connect(self.label_choose_listener)
 
     def keyReleaseEvent(self, e):
-        buttons = self.all_label.findChildren(QtWidgets.QRadioButton)
-
         if e.key() == QtCore.Qt.Key_Left:
             self.prev_button.click()
         if e.key() == QtCore.Qt.Key_Right or e.key() == QtCore.Qt.Key_Space:
             self.next_button.click()
-        if e.key() == QtCore.Qt.Key_1 and len(buttons) >= 1:
-            buttons[0].click()
-        if e.key() == QtCore.Qt.Key_2 and len(buttons) >= 2:
-            buttons[1].click()
-        if e.key() == QtCore.Qt.Key_3 and len(buttons) >= 3:
-            buttons[2].click()
-        if e.key() == QtCore.Qt.Key_4 and len(buttons) >= 4:
-            buttons[3].click()
-        if e.key() == QtCore.Qt.Key_5 and len(buttons) >= 5:
-            buttons[4].click()
-        if e.key() == QtCore.Qt.Key_6 and len(buttons) >= 6:
-            buttons[5].click()
-        if e.key() == QtCore.Qt.Key_7 and len(buttons) >= 7:
-            buttons[6].click()
-        if e.key() == QtCore.Qt.Key_8 and len(buttons) >= 8:
-            buttons[7].click()
-        if e.key() == QtCore.Qt.Key_9 and len(buttons) >= 9:
-            buttons[8].click()
-        if e.key() == QtCore.Qt.Key_0 and len(buttons) >= 10:
-            buttons[9].click()
+
+        buttons = self.all_label.findChildren(QtWidgets.QRadioButton)
+        for i in range(config.max_label_num):
+            if e.key() == QtCore.Qt.Key_1 + i and len(buttons) >= 1 + i:
+                buttons[i].click()
 
     def set_img(self, path=None):
         # 绘制图像
@@ -264,8 +243,8 @@ class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
 
     def add_label_radio_button_listener(self):
         # TODO: add button listener
-        if len(self.all_label.findChildren(QtWidgets.QRadioButton)) >= __max_label_num__:
-            QtWidgets.QMessageBox.information(self, "信息", f"最大添加量为{__max_label_num__}", QtWidgets.QMessageBox.Yes)
+        if len(self.all_label.findChildren(QtWidgets.QRadioButton)) >= config.max_label_num:
+            QtWidgets.QMessageBox.information(self, "信息", f"最大添加量为{config.max_label_num}", QtWidgets.QMessageBox.Yes)
         elif self.save_dir is None:
             QtWidgets.QMessageBox.warning(self, "警告", "尚未选择保存图片路径", QtWidgets.QMessageBox.Yes)
         else:
@@ -339,8 +318,8 @@ class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
 
     def read_user_profile(self):
         # 读取配置文件
-        if os.path.exists(os.path.join('.', __profile__)):
-            with open(os.path.join('.', __profile__), 'r') as f:
+        if os.path.exists(os.path.join('.', config.profile)):
+            with open(os.path.join('.', config.profile), 'r') as f:
                 dic = json.load(f)
                 index = self.index_of_current_user(dic)
 
@@ -352,7 +331,7 @@ class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
                     self.update_from_profile()
                     self.set_img()
         else:
-            with open(os.path.join('.', __profile__), 'w') as f:
+            with open(os.path.join('.', config.profile), 'w') as f:
                 # 写入初始json构造
                 dic = {'user': []}
                 json.dump(dic, f, indent=4, separators=[',', ':'])
@@ -361,8 +340,8 @@ class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
         # 关闭窗口时保存配置文件
         reply = QtWidgets.QMessageBox.question(self, '本程序', "是否要退出程序？", QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.No)
         if reply == QtWidgets.QMessageBox.Yes:
-            if os.path.exists(os.path.join('.', __profile__)):
-                with open(os.path.join('.', __profile__), 'r') as f:
+            if os.path.exists(os.path.join('.', config.profile)):
+                with open(os.path.join('.', config.profile), 'r') as f:
                     dic = json.load(f)
                     index = self.index_of_current_user(dic)
 
@@ -375,7 +354,7 @@ class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
                     else:
                         dic['user'].append({'username': self.username, 'img_dir': self.img_dir, 'save_dir':self.save_dir, 'img_name': self.img_name, 'label_name':self.label_name})
 
-                with open(os.path.join('.', __profile__), 'w') as f:
+                with open(os.path.join('.', config.profile), 'w') as f:
                     json.dump(dic, f, indent=4, separators=[',', ':'])
             e.accept()
         else:
