@@ -184,7 +184,7 @@ class Ui_MainWindow(object):
         self.prev_button.setText(_translate("MainWindow", "上一张"))
         self.next_button.setText(_translate("MainWindow", "下一张"))
         self.username_label.setText(_translate("MainWindow", "UserName"))
-        self.labeled_label.setText(_translate("MainWindow", "打标签数："))
+        self.labeled_label.setText(_translate("MainWindow", "增加标签数："))
         self.userlabel.setText(_translate("MainWindow", "用户名："))
         self.labeled_number_label.setText(_translate("MainWindow", "0"))
         self.edit_label.setText(_translate("MainWindow", "修改标签数："))

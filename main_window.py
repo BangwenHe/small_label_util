@@ -10,7 +10,7 @@ import json
 
 __appname__ = u'图片标注小工具'
 __max_label_num__ = 10
-__profile__ = 'profile.json'
+__profile__ = 'config.json'
 
 
 class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
@@ -20,7 +20,7 @@ class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
         self.img_list = None    # 图片路径下的所有图片名称数组
         self.img_name = None    # 当前显示图片的名称
         self.labels = None      # 所有图片的标签
-        self.label_name = None  # 所有标签名
+        self.label_name = []    # 所有标签名
         self.labeled_img = 0    # 已打标签数量
         self.edited_img = 0     # 修改标签数量
         self.username = username # 用户名
@@ -69,7 +69,7 @@ class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
         if self.img_dir is not None:
             try:
                 self.img_list = [fn for fn in os.listdir(self.img_dir) if any(fn.endswith(ext) for ext in suffix)]
-                self.labels = [1 for n in range(0, len(self.img_list))]
+                self.labels = [0 for n in range(0, len(self.img_list))]
                 self.img_preview_list.clear()
                 self.img_preview_list.addItems(self.img_list)
                 self.img_preview_list.itemActivated.connect(self.item_activated)
@@ -99,16 +99,32 @@ class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
                 btn.clicked.connect(self.label_choose_listener)
 
     def keyReleaseEvent(self, e):
+        buttons = self.all_label.findChildren(QtWidgets.QRadioButton)
+
         if e.key() == QtCore.Qt.Key_Left:
             self.prev_button.click()
         if e.key() == QtCore.Qt.Key_Right or e.key() == QtCore.Qt.Key_Space:
             self.next_button.click()
-        if e.key() == QtCore.Qt.Key_1:
-            self.person_not_cheat_radio.click()
-        if e.key() == QtCore.Qt.Key_2:
-            self.person_cheat_radio.click()
-        if e.key() == QtCore.Qt.Key_3:
-            self.blur_radio.click()
+        if e.key() == QtCore.Qt.Key_1 and len(buttons) >= 1:
+            buttons[0].click()
+        if e.key() == QtCore.Qt.Key_2 and len(buttons) >= 2:
+            buttons[1].click()
+        if e.key() == QtCore.Qt.Key_3 and len(buttons) >= 3:
+            buttons[2].click()
+        if e.key() == QtCore.Qt.Key_4 and len(buttons) >= 4:
+            buttons[3].click()
+        if e.key() == QtCore.Qt.Key_5 and len(buttons) >= 5:
+            buttons[4].click()
+        if e.key() == QtCore.Qt.Key_6 and len(buttons) >= 6:
+            buttons[5].click()
+        if e.key() == QtCore.Qt.Key_7 and len(buttons) >= 7:
+            buttons[6].click()
+        if e.key() == QtCore.Qt.Key_8 and len(buttons) >= 8:
+            buttons[7].click()
+        if e.key() == QtCore.Qt.Key_9 and len(buttons) >= 9:
+            buttons[8].click()
+        if e.key() == QtCore.Qt.Key_0 and len(buttons) >= 10:
+            buttons[9].click()
 
     def set_img(self, path=None):
         # 绘制图像
@@ -120,7 +136,7 @@ class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
 
         # 绘制标签
         label = self.labels[self.img_list.index(self.img_name)]
-        if label >= 0:
+        if label >= 0 and len(self.label_name) > 0:
             buttons = self.all_label.findChildren(QtWidgets.QRadioButton)
             buttons[label].toggle()
 
@@ -250,16 +266,36 @@ class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
         # TODO: add button listener
         if len(self.all_label.findChildren(QtWidgets.QRadioButton)) >= __max_label_num__:
             QtWidgets.QMessageBox.information(self, "信息", f"最大添加量为{__max_label_num__}", QtWidgets.QMessageBox.Yes)
+        elif self.save_dir is None:
+            QtWidgets.QMessageBox.warning(self, "警告", "尚未选择保存图片路径", QtWidgets.QMessageBox.Yes)
         else:
             btn = QtWidgets.QRadioButton(self.all_label)
             dialog = label_dialog.LabelDialog(btn=btn)
 
             # 确认说明标签添加成功
             if dialog.exec_() == QtWidgets.QDialog.Accepted:
-                text = btn.text()
-                self.label_name.append(text)
-                os.mkdir(os.path.join(self.save_dir, text))
-                self.verticalLayout_2.addWidget(btn)
+                    text= btn.text()
+                    self.label_name.append(text)
+
+                    if not os.path.exists(os.path.join(self.save_dir, text)):
+                        os.mkdir(os.path.join(self.save_dir, text))
+                    else:
+                        # 读取该文件夹的所有文件并刷新标签
+                        suffix = ['jpg', 'jpeg', 'bmp', 'png']
+                        for label in self.label_name:
+                            imgs = [fn for fn in os.listdir(os.path.join(self.save_dir, label)) if
+                                    any(fn.endswith(ext) for ext in suffix)]
+                            for img in imgs:
+                                if img in self.img_list:
+                                    self.labels[self.img_list.index(img)] = self.label_name.index(label)
+
+                        # 更新标签
+                        label = self.labels[self.img_list.index(self.img_name)]
+                        if label >= 0 and len(self.label_name) > 0:
+                            buttons = self.all_label.findChildren(QtWidgets.QRadioButton)
+                            buttons[label].toggle()
+
+                    self.verticalLayout_2.addWidget(btn)
 
     def delete_label_radio_button_listener(self):
         # TODO: delete button listner
@@ -268,6 +304,8 @@ class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
         text = btn.text()
         if btn is None:
             QtWidgets.QMessageBox.warning(self, "警告", "尚未选择标签", QtWidgets.QMessageBox.Yes)
+        elif self.save_dir is None:
+            QtWidgets.QMessageBox.warning(self, "警告", "尚未选择保存图片路径", QtWidgets.QMessageBox.Yes)
         else:
             index = self.label_name.index(text)
             for i in range(len(self.labels)):
@@ -280,8 +318,12 @@ class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
 
     def edit_label_radio_button_listener(self):
         btn = self.get_checked_button()
-        text = btn.text()
-        if btn is not None:
+        if self.save_dir is None:
+            QtWidgets.QMessageBox.warning(self, "警告", "尚未选择保存图片路径", QtWidgets.QMessageBox.Yes)
+        elif btn is None:
+            QtWidgets.QMessageBox.warning(self, "警告", "尚未选择标签", QtWidgets.QMessageBox.Yes)
+        else:
+            text = btn.text()
             dialog = label_dialog.LabelDialog(btn=btn)
 
             # 若修改成功,则修改文件夹名称
@@ -290,13 +332,16 @@ class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
                 os.rename(os.path.join(self.save_dir, text), os.path.join(self.save_dir, btn.text()))
 
     def index_of_current_user(self, dic):
-        return [d['username'] for d in dic['user']].index(self.username)
+        try:
+            return [d['username'] for d in dic['user']].index(self.username)
+        except ValueError as e:
+            return -1
 
     def read_user_profile(self):
         # 读取配置文件
         if os.path.exists(os.path.join('.', __profile__)):
             with open(os.path.join('.', __profile__), 'r') as f:
-                dic = json.loads(" ".join(f.readlines()))
+                dic = json.load(f)
                 index = self.index_of_current_user(dic)
 
                 if index >= 0:
@@ -306,6 +351,33 @@ class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
                     self.label_name = dic['user'][index]['label_name']
                     self.update_from_profile()
                     self.set_img()
+        else:
+            with open(os.path.join('.', __profile__), 'w') as f:
+                dic = {'user': []}
+                json.dump(dic, f, indent=4, separators=[',', ':'])
+
+    def closeEvent(self, e):
+        reply = QtWidgets.QMessageBox.question(self, '本程序', "是否要退出程序？", QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.No)
+        if reply == QtWidgets.QMessageBox.Yes:
+            if os.path.exists(os.path.join('.', __profile__)):
+                with open(os.path.join('.', __profile__), 'r') as f:
+                    dic = json.load(f)
+                    index = self.index_of_current_user(dic)
+
+                    # 存在
+                    if index >= 0:
+                        dic['user'][index]['img_dir'] = self.img_dir
+                        dic['user'][index]['save_dir'] = self.save_dir
+                        dic['user'][index]['img_name'] = self.img_name
+                        dic['user'][index]['label_name'] = self.label_name
+                    else:
+                        dic['user'].append({'username': self.username, 'img_dir': self.img_dir, 'save_dir':self.save_dir, 'img_name': self.img_name, 'label_name':self.label_name})
+
+                with open(os.path.join('.', __profile__), 'w') as f:
+                    json.dump(dic, f, indent=4, separators=[',', ':'])
+            e.accept()
+        else:
+            e.ignore()
 
 
 if __name__ == '__main__':
