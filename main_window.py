@@ -220,8 +220,7 @@ class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
             self.set_img()
 
     def help_listener(self):
-        QtWidgets.QMessageBox.information(self.centralwidget, '帮助', """1. 快捷键: 左方向键(上一张), 右方向键(下一张,空格), person_not_cheat(数字键1), person_cheat(数字键2), blur(数字键3)
-2. 流程: 选择打开文件路径->选择改变图像保存路径->显示图片后可以开始打标签""")
+        QtWidgets.QMessageBox.information(self.centralwidget, '帮助', config.help_text)
 
     def label_choose_listener(self):
         if self.save_dir is None:
@@ -286,14 +285,17 @@ class MainWindow(QtWidgets.QMainWindow, ui_main_window.Ui_MainWindow):
         elif self.save_dir is None:
             QtWidgets.QMessageBox.warning(self, "警告", "尚未选择保存图片路径", QtWidgets.QMessageBox.Yes)
         else:
-            index = self.label_name.index(text)
-            for i in range(len(self.labels)):
-                if self.labels[i] >= index:
-                    self.labels[i] -= 1
+            result = QtWidgets.QMessageBox.question(self, "删除标签", "确认删除?(不会删除标签文件夹)")
 
-            self.label_name.remove(text)
-            shutil.rmtree(os.path.join(self.save_dir, text))
-            btn.deleteLater()
+            if result == QtWidgets.QDialog.Accepted:
+                index = self.label_name.index(text)
+                for i in range(len(self.labels)):
+                    if self.labels[i] >= index:
+                        self.labels[i] -= 1
+
+                self.label_name.remove(text)
+                # shutil.rmtree(os.path.join(self.save_dir, text))
+                btn.deleteLater()
 
     def edit_label_radio_button_listener(self):
         btn = self.get_checked_button()
